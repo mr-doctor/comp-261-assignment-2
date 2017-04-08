@@ -35,7 +35,7 @@ public class AucklandRoads extends GUI {
 	// the amounts to translate the canvas by
 	private double moveX;
 	private double moveY;
-	private double scale = 5;
+	private double scale = 6;
 	
 	// a quick way to draw the selected node
 	private Node selectedNode;
