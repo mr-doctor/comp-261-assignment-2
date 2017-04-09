@@ -2,15 +2,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AStarNode implements Comparable<AStarNode> {
+public class HandlerNode implements Comparable<HandlerNode> {
 	
 	private Node n;
 	private double costFromStart;
 	private double heuristicCost;
 	private double actualCost;
-	private AStarNode parent;
+	private HandlerNode parent;
 	
-	public AStarNode(AStarNode p, Node n, double c, double h) {
+	public int count = Integer.MAX_VALUE;
+	public int numSubtrees = 0;
+	private List<HandlerNode> articulationPoints;
+	
+	public HandlerNode(HandlerNode p, Node n, double c, double h) {
 		this.parent = p;
 		this.n = n;
 		this.costFromStart = c;
@@ -42,7 +46,7 @@ public class AStarNode implements Comparable<AStarNode> {
 		return this.actualCost;
 	}
 	
-	public AStarNode getParent() {
+	public HandlerNode getParent() {
 		return this.parent;
 	}
 	
@@ -54,19 +58,27 @@ public class AStarNode implements Comparable<AStarNode> {
 		return n.getSegments();
 	}
 	
-	public List<AStarNode> getNeighbours() {
+	public int count() {
+		return this.count;
+	}
+	
+	public List<HandlerNode> articulationPoints() {
+		return this.articulationPoints;
+	}
+	
+	public List<HandlerNode> getNeighbours() {
 		return n.getSegments().stream()
 				.map(seg -> seg.findOtherEnd(n))
-				.map(node -> new AStarNode(this, node, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY))
+				.map(node -> new HandlerNode(this, node, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY))
 				.collect(Collectors.toList());
 	}
 
-	public void setParent(AStarNode current) {
+	public void setParent(HandlerNode current) {
 		this.parent = current;
 		
 	}
 
-	public int compareTo(AStarNode o) {
+	public int compareTo(HandlerNode o) {
 		if (this.actualCost < o.getActualCost()) {
 			return -1;
 		} else if (this.actualCost > o.getActualCost()) {
@@ -91,7 +103,7 @@ public class AStarNode implements Comparable<AStarNode> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AStarNode other = (AStarNode) obj;
+		HandlerNode other = (HandlerNode) obj;
 		if (n == null) {
 			if (other.n != null)
 				return false;

@@ -7,24 +7,30 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Queue;
 
-public class RouteHandler {
+public class GraphHandler {
+	
+	private Map<Integer, Node> nodes;
+	
+	public GraphHandler(Map<Integer, Node> nodes) {
+		this.nodes = nodes;
+	}
 	
 	public List<Node> findPath(Node start, Node goal) {
 		
-		Queue<AStarNode> frontier = new PriorityQueue<>();
-		Set<AStarNode> closed = new HashSet<>();
+		Queue<HandlerNode> frontier = new PriorityQueue<>();
+		Set<HandlerNode> closed = new HashSet<>();
 
-		AStarNode firstNode = new AStarNode(null, start, 0, calculateHeuristic(start, goal));
+		HandlerNode firstNode = new HandlerNode(null, start, 0, calculateHeuristic(start, goal));
 		frontier.add(firstNode);
 		
 		while (!frontier.isEmpty()) {
-			AStarNode current = frontier.poll();
+			HandlerNode current = frontier.poll();
 			
 			if (current.getNode().equals(goal)) {
 				return retrace(current);
 			}
 		
-			for (AStarNode neighbour : current.getNeighbours()) {
+			for (HandlerNode neighbour : current.getNeighbours()) {
 				if (closed.contains(neighbour)) {
 					continue;
 				}
@@ -56,7 +62,7 @@ public class RouteHandler {
 		return a.getLocation().distance(b.getLocation());
 	}
 	
-	public List<Node> retrace(AStarNode goal) {
+	public List<Node> retrace(HandlerNode goal) {
 		List<Node> path = new ArrayList<>();
 		while (goal != null) {
 			path.add(goal.getNode());
@@ -65,9 +71,32 @@ public class RouteHandler {
 		return path;
 	}
 	
-	public List<Node> findArticulationPoints(Node n) {
-		
-		return null;
+	public void findArticulationPoints(Node start) {
+		HandlerNode startHandler = new HandlerNode(null, start, 0, 0);
+		for (HandlerNode neighbour : startHandler.getNeighbours()) {
+			if (neighbour.count == Integer.MAX_VALUE) {
+				addArticulationPoint(neighbour, 1, startHandler);
+				startHandler.numSubtrees++;
+			}
+		}
+	}
+	
+	public int addArticulationPoint(HandlerNode node, int count, HandlerNode fromNode) {
+		node.count = count;
+		int reachBack = count;
+		for (HandlerNode neighbour : node.getNeighbours()) {
+			if (neighbour.count < Integer.MAX_VALUE) {
+				reachBack = Math.min(neighbour.count, reachBack);
+			} else {
+				int childReach = addArticulationPoint(neighbour, count+1, node);
+				if (childReach >= count) {
+					fromNode.articulationPoints().add(node);
+					System.out.println(node);
+				}
+				reachBack = Math.min(childReach, reachBack);
+			}
+		}
+		return reachBack;
 	}
 	
 }

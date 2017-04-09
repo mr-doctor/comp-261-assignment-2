@@ -45,11 +45,11 @@ public class AucklandRoads extends GUI {
 	
 	private double oldScale = 1;
 	
-	private final RouteHandler routeHandler;
+	private final GraphHandler graphHandler;
 	private List<Node> path;
 	
 	public AucklandRoads() {
-		routeHandler = new RouteHandler();
+		graphHandler = new GraphHandler(nodeIndex);
 	}
 	
 	// deals with all the files
@@ -203,6 +203,7 @@ public class AucklandRoads extends GUI {
 
 		selectedNode.setSelected(true);
 		printNodeInfo(this.selectedNode);
+		graphHandler.findArticulationPoints(this.selectedNode);
 
 	}
 
@@ -335,7 +336,7 @@ public class AucklandRoads extends GUI {
 		}
 		
 		if (this.selectedNode != null && this.lastNode != null) {
-			this.path = routeHandler.findPath(this.lastNode, this.selectedNode);
+			this.path = graphHandler.findPath(this.lastNode, this.selectedNode);
 			for (int i=0; i<this.path.size()-1; i++) {
 				if (i != 0) {
 					this.path.get(i).setOnPath(true);
