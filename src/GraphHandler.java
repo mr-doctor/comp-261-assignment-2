@@ -73,6 +73,8 @@ public class GraphHandler {
 	
 	public void findArticulationPoints(Node start) {
 		HandlerNode startHandler = new HandlerNode(null, start, 0, 0);
+		startHandler.numSubtrees = 0;
+		startHandler.count = 0;
 		for (HandlerNode neighbour : startHandler.getNeighbours()) {
 			if (neighbour.count == Integer.MAX_VALUE) {
 				addArticulationPoint(neighbour, 1, startHandler);
@@ -84,7 +86,7 @@ public class GraphHandler {
 	public int addArticulationPoint(HandlerNode node, int count, HandlerNode fromNode) {
 		node.count = count;
 		int reachBack = count;
-		for (HandlerNode neighbour : node.getNeighbours()) {
+		for (HandlerNode neighbour : node.getArticulationNeighbours()) {
 			if (neighbour.count < Integer.MAX_VALUE) {
 				reachBack = Math.min(neighbour.count, reachBack);
 			} else {
