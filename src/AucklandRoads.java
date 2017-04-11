@@ -5,20 +5,15 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 
 public class AucklandRoads extends GUI {
 
@@ -211,7 +206,6 @@ public class AucklandRoads extends GUI {
 
 		selectedNode.setSelected(true);
 		printNodeInfo(this.selectedNode);
-
 	}
 
 	private Location canvasPointToLocation(Point p) {

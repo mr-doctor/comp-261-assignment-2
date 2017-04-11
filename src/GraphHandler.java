@@ -1,6 +1,5 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +32,12 @@ public class GraphHandler {
 			if (current.getNode().equals(goal)) {
 				return retrace(current);
 			}
-		
+			
 			for (HandlerNode neighbour : current.getNeighbours()) {
 				if (closed.contains(neighbour)) {
 					continue;
 				}
+				
 				int cID = current.getNode().getID();
 				int nID = neighbour.getNode().getID();
 				Segment seg = current.getSegments().stream()
@@ -52,6 +52,7 @@ public class GraphHandler {
 				} else if (actualCost >= neighbour.getActualCost()) {
 					continue;
 				}
+				
 				neighbour.setParent(current);
 				neighbour.setActualCost(actualCost);
 				neighbour.setHeuristicCost(calculateHeuristic(neighbour.getNode(), goal));

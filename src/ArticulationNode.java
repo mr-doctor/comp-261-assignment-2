@@ -1,6 +1,3 @@
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class ArticulationNode {
 	private Node n;
 	public int count = 0;
@@ -19,6 +16,4 @@ public class ArticulationNode {
 	public Node getParent() {
 		return this.parent;
 	}
-	
-	
 }
