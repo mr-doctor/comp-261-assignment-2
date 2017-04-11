@@ -1,8 +1,10 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,8 +14,12 @@ public class Node {
 	private int ID;
 	private Location location;
 	private boolean selected = false;
+	private boolean isArticulation = false;
 	private Set<Segment> segments = new HashSet<>();
 	private boolean onPath = false;
+	public int count = Integer.MAX_VALUE;
+	public int reachBack = 0;
+	public Queue<Node> children;
 	
 	public Node(int ID, Location loc) {
 		this.ID = ID;
@@ -55,15 +61,22 @@ public class Node {
 		int size = Math.min((int) (0.05 * (scale)), 3);
 		g.setColor(Color.BLUE);
 		
+		if (this.isArticulation) {
+			g.setColor(Color.YELLOW);
+		}
 		if (this.onPath) {
 			g.setColor(Color.RED);
 		}
+		
 		// draws it at the scaled point
 		g.fillRect((int) (this.getNodePoint(scale).x - size/2), (int) (this.getNodePoint(scale).y - size/2), size, size);
 		
 		// debugging
 		//System.out.println(this.ID + " {Location: " + this.getLocation() + "\n Point: " +this.getNodePoint(scale) + "}\n");
 	}
+	
+	
+	
 	public Set<Segment> getSegments() {
 		return segments;
 	}
@@ -89,5 +102,13 @@ public class Node {
 			return false;
 		return true;
 	}
-	
+	public List<Node> getNeighbours() {
+		return getSegments().stream()
+				.map(seg -> seg.findOtherEnd(this))
+				.collect(Collectors.toList());
+	}
+
+	public void setArticulation(boolean b) {
+		this.isArticulation = b;
+	}
 }

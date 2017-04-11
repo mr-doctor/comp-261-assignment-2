@@ -1,18 +1,22 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Queue;
 
 public class GraphHandler {
 	
 	private Map<Integer, Node> nodes;
+	private Set<Node> articulationPoints = new HashSet<>();
 	
-	public GraphHandler(Map<Integer, Node> nodes) {
-		this.nodes = nodes;
+	public GraphHandler(Map<Integer, Node> m) {
+		this.nodes = m;
 	}
 	
 	public List<Node> findPath(Node start, Node goal) {
@@ -71,34 +75,59 @@ public class GraphHandler {
 		return path;
 	}
 	
-	public void findArticulationPoints(Node start) {
-		HandlerNode startHandler = new HandlerNode(null, start, 0, 0);
-		startHandler.numSubtrees = 0;
-		startHandler.count = 0;
-		for (HandlerNode neighbour : startHandler.getNeighbours()) {
+	public Set<Node> initialiseArticulation() {
+		for (Entry<Integer, Node> entry : nodes.entrySet()) {
+			entry.getValue().count = Integer.MAX_VALUE;
+		}
+		Node start = nodes.values().iterator().next();
+		start.count = 0;
+		int numSubtrees = 0;
+		
+		for (Node neighbour : start.getNeighbours()) {
 			if (neighbour.count == Integer.MAX_VALUE) {
-				addArticulationPoint(neighbour, 1, startHandler);
-				startHandler.numSubtrees++;
+				iterArticulationPoints(neighbour, start);
+				numSubtrees++;
 			}
 		}
+		if (numSubtrees > 1) {
+			articulationPoints.add(start);
+		}
+		
+		return articulationPoints;
 	}
 	
-	public int addArticulationPoint(HandlerNode node, int count, HandlerNode fromNode) {
-		node.count = count;
-		int reachBack = count;
-		for (HandlerNode neighbour : node.getArticulationNeighbours()) {
-			if (neighbour.count < Integer.MAX_VALUE) {
-				reachBack = Math.min(neighbour.count, reachBack);
-			} else {
-				int childReach = addArticulationPoint(neighbour, count+1, node);
-				if (childReach >= count) {
-					fromNode.articulationPoints().add(node);
-					System.out.println(node);
+	public void iterArticulationPoints(Node firstNode, Node root) {
+		Stack<ArticulationNode> stack = new Stack<>();
+		stack.push(new ArticulationNode(firstNode, 1, root));
+		while (!stack.isEmpty()) {
+			ArticulationNode aNode = stack.peek();
+			if (aNode.getNode().count == Integer.MAX_VALUE) {
+				aNode.getNode().count = aNode.count;
+				aNode.getNode().reachBack = aNode.count;
+				aNode.getNode().children = new ArrayDeque<>();
+				for (Node neighbour : aNode.getNode().getNeighbours()) {
+					if (!neighbour.equals(aNode.getParent())) {
+						aNode.getNode().children.add(neighbour);
+					}
 				}
-				reachBack = Math.min(childReach, reachBack);
+			} else if (!aNode.getNode().children.isEmpty()) {
+				Node child = aNode.getNode().children.poll();
+				if (child.count < Integer.MAX_VALUE) {
+					aNode.getNode().reachBack = Math.min(aNode.getNode().reachBack, child.count);
+				} else {
+					stack.push(new ArticulationNode(child, aNode.getNode().count+1, aNode.getNode()));
+				}
+			} else {
+				if (!aNode.getNode().equals(firstNode)) {
+					if (aNode.getNode().reachBack >= aNode.getParent().count) {
+						System.out.println("adding...");
+						articulationPoints.add(aNode.getParent());
+						aNode.getParent().reachBack = Math.min(aNode.getParent().reachBack, aNode.getNode().reachBack);
+					}
+				}
+				stack.pop();
 			}
 		}
-		return reachBack;
 	}
 	
 }

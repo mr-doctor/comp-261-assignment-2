@@ -74,22 +74,6 @@ public class HandlerNode implements Comparable<HandlerNode> {
 				.collect(Collectors.toList());
 	}
 	
-	public List<HandlerNode> getArticulationNeighbours() {
-		List<HandlerNode> neighbours = new ArrayList<>();
-		for (Segment s : n.getSegments()) {
-			Node otherNode = s.findOtherEnd(this.n);
-			HandlerNode handler = new HandlerNode(this, otherNode, 0, 0);
-			System.out.println(otherNode);
-			neighbours.add(handler);
-		}
-		
-		return neighbours;
-		/*return n.getSegments().stream()
-				.map(seg -> seg.findOtherEnd(n))
-				.map(node -> new HandlerNode(this, node, 0, 0))
-				.collect(Collectors.toList());*/
-	}
-	
 	public void setParent(HandlerNode current) {
 		this.parent = current;
 		

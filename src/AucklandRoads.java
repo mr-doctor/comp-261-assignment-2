@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Vector;
 
 public class AucklandRoads extends GUI {
@@ -47,6 +48,7 @@ public class AucklandRoads extends GUI {
 	
 	private final GraphHandler graphHandler;
 	private List<Node> path;
+	private Set<Node> articulationPoints;
 	
 	public AucklandRoads() {
 		graphHandler = new GraphHandler(nodeIndex);
@@ -109,6 +111,9 @@ public class AucklandRoads extends GUI {
 					locations));						// locations
 		}
 		
+		this.articulationPoints = graphHandler.initialiseArticulation();
+		System.out.println(this.articulationPoints.size());
+		
 	}
 	
 	// takes all the files and turns them into lists. Only handles the polygons data if it exists
@@ -152,9 +157,13 @@ public class AucklandRoads extends GUI {
 				this.selectedNode = entry.getValue();
 				entry.getValue().setSelected(true);
 			}*/
-			
+			if (this.articulationPoints.contains(entry.getValue())) {
+				entry.getValue().setArticulation(true);
+			}
 			entry.getValue().draw(g, scale);
 		}
+		
+		
 		
 		// draws the selected node, provided it exists at this stage
 		if (this.selectedNode != null) {
@@ -170,11 +179,10 @@ public class AucklandRoads extends GUI {
 		}
 		
 		if (this.lastNode != null) {
-			g.setColor(Color.YELLOW);
+			g.setColor(Color.ORANGE);
 			int size = 7;
 			g.fillOval((int) (this.lastNode.getNodePoint(scale).x - size/2), (int) (this.lastNode.getNodePoint(scale).y - size/2), size, size);
 		}
-		
 	}
 
 	protected void onClick(MouseEvent e) {
@@ -203,7 +211,6 @@ public class AucklandRoads extends GUI {
 
 		selectedNode.setSelected(true);
 		printNodeInfo(this.selectedNode);
-		graphHandler.findArticulationPoints(this.selectedNode);
 
 	}
 
