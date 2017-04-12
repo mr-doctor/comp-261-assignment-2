@@ -99,7 +99,7 @@ public class AucklandRoads extends GUI {
 			}
 			
 			parentRoad.addSegment(new Segment(
-					Integer.parseInt(splitData[0]),		// road ID
+					parentRoad,							// road
 					Double.parseDouble(splitData[1]),	// length
 					nodeIndex.get(Integer.parseInt(splitData[2])),		// node 1 ID
 					nodeIndex.get(Integer.parseInt(splitData[3])),		// node 2 ID
@@ -336,7 +336,7 @@ public class AucklandRoads extends GUI {
 			}
 		}
 		
-		if (this.selectedNode != null && this.lastNode != null) {
+		if (this.selectedNode != null && this.lastNode != null && this.path != null) {
 			this.path = graphHandler.findPath(this.lastNode, this.selectedNode);
 			for (int i=0; i<this.path.size()-1; i++) {
 				if (i != 0) {

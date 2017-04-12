@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Segment {
 	
-	private int parentRoadID;
+	private Road parentRoad;
 	private double length;
 	private Node node1;
 	private Node node2;
@@ -14,8 +14,8 @@ public class Segment {
 	private boolean selected = false;
 	private boolean onPath = false;
 	
-	public Segment(int pRID, double l, Node node1, Node node2, ArrayList<Location> locs) {
-		this.parentRoadID = pRID;
+	public Segment(Road p, double l, Node node1, Node node2, ArrayList<Location> locs) {
+		this.parentRoad = p;
 		this.length = l;
 		this.node1 = node1;
 		this.node2 = node2;
@@ -28,7 +28,7 @@ public class Segment {
 	// getters and setters
 	
 	public int getParentRoadID(){
-		return this.parentRoadID;
+		return this.getParentRoad().getID();
 	}
 	
 	public double getLength() {
@@ -80,6 +80,9 @@ public class Segment {
 			// makes sure that the default selection state is false
 			this.selected = false;
 		}
+		if (this.parentRoad.isOneWay()) {
+			g.setColor(new Color(255, 0, 255));
+		}
 		if (this.onPath) {
 			g.setColor(Color.RED.darker());
 		}
@@ -92,5 +95,9 @@ public class Segment {
 			Point p2 = getPoint(l2, scale);
 			g.drawLine(p1.x, p1.y, p2.x, p2.y);
 		}
+	}
+
+	public Road getParentRoad() {
+		return this.parentRoad;
 	}
 }

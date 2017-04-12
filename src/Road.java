@@ -42,7 +42,7 @@ public class Road {
 		return this.city;
 	}
 	
-	public boolean getOneWay() {
+	public boolean isOneWay() {
 		return this.oneWay;
 	}
 	

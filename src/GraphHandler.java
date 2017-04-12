@@ -121,7 +121,6 @@ public class GraphHandler {
 			} else {
 				if (!aNode.getNode().equals(firstNode)) {
 					if (aNode.getNode().reachBack >= aNode.getParent().count) {
-						System.out.println("adding...");
 						articulationPoints.add(aNode.getParent());
 						aNode.getParent().reachBack = Math.min(aNode.getParent().reachBack, aNode.getNode().reachBack);
 					}
