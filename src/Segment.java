@@ -80,9 +80,6 @@ public class Segment {
 			// makes sure that the default selection state is false
 			this.selected = false;
 		}
-		if (this.parentRoad.isOneWay()) {
-			g.setColor(new Color(255, 0, 255));
-		}
 		if (this.onPath) {
 			g.setColor(Color.RED.darker());
 		}

@@ -7,6 +7,8 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +46,8 @@ public class AucklandRoads extends GUI {
 	private final GraphHandler graphHandler;
 	private List<Node> path;
 	private Set<Node> articulationPoints;
+	private double pathLength = 0;
+	private double time;
 	
 	public AucklandRoads() {
 		graphHandler = new GraphHandler(nodeIndex);
@@ -105,10 +109,7 @@ public class AucklandRoads extends GUI {
 					nodeIndex.get(Integer.parseInt(splitData[3])),		// node 2 ID
 					locations));						// locations
 		}
-		
 		this.articulationPoints = graphHandler.initialiseArticulation();
-		System.out.println(this.articulationPoints.size());
-		
 	}
 	
 	// takes all the files and turns them into lists. Only handles the polygons data if it exists
@@ -157,8 +158,6 @@ public class AucklandRoads extends GUI {
 			}
 			entry.getValue().draw(g, scale);
 		}
-		
-		
 		
 		// draws the selected node, provided it exists at this stage
 		if (this.selectedNode != null) {
@@ -328,6 +327,8 @@ public class AucklandRoads extends GUI {
 	
 	protected void pathfind() {
 		if (this.path != null) {
+			this.pathLength = 0;
+			this.time = 0;
 			for (Node n : this.path) {
 				n.setOnPath(false);
 				for (Iterator<Segment> it = n.getSegments().iterator(); it.hasNext();) {
@@ -336,24 +337,82 @@ public class AucklandRoads extends GUI {
 			}
 		}
 		
-		if (this.selectedNode != null && this.lastNode != null && this.path != null) {
+		if (this.selectedNode != null && this.lastNode != null) {
 			this.path = graphHandler.findPath(this.lastNode, this.selectedNode);
-			for (int i=0; i<this.path.size()-1; i++) {
-				if (i != 0) {
-					this.path.get(i).setOnPath(true);
-				}
-				for (Iterator<Segment> it = this.path.get(i).getSegments().iterator(); it.hasNext();) {
-					Segment s = it.next();
-					if (s.findOtherEnd(this.path.get(i)).equals(this.path.get(i+1))) {
-						s.setOnPath(true);
+			if (this.path != null) {
+				for (int i=0; i<this.path.size()-1; i++) {
+					if (i != 0) {
+						this.path.get(i).setOnPath(true);
+					}
+					for (Iterator<Segment> it = this.path.get(i).getSegments().iterator(); it.hasNext();) {
+						Segment s = it.next();
+						if (s.findOtherEnd(this.path.get(i)).equals(this.path.get(i+1))) {
+							s.setOnPath(true);
+							this.pathLength  += s.getLength();
+							double speed = s.getParentRoad().getSpeedLimit();
+							if (speed == 0) {
+								speed = 5;
+							} else {
+								speed *= 20;
+							}
+							
+							this.time += s.getLength() / speed;
+						}
 					}
 				}
+				printRoute();
 			}
 		}
 	}
 	
+	private void printRoute() {
+		String unit = "hours";
+		int dp = 2;
+		if (this.time < 1) {
+			this.time *= 60;
+			unit = "minutes";
+			dp = 1;
+		}
+		getTextOutputArea().setText("");
+		Map<String, Double> roadsAndLengths = new HashMap<>();
+		
+		for (int i=0; i<this.path.size(); i++) {
+			List<Segment> segs = setToList(this.path.get(i).getSegments());
+			for (int j=0; j<segs.size(); j++) {
+				String roadName = segs.get(j).getParentRoad().getName();
+				if (roadName.equals("-")) {
+					roadName = "Walkway";
+				}
+				if (roadsAndLengths.containsKey(roadName)) {
+					roadsAndLengths.put(roadName, roadsAndLengths.get(roadName) + segs.get(j).getLength());
+				} else {
+					roadsAndLengths.put(roadName, segs.get(j).getLength());
+				}
+			}
+		}
+		for (Map.Entry<String, Double> entry : roadsAndLengths.entrySet()) {
+			getTextOutputArea().append(entry.getKey() + ": " + round(entry.getValue(), 3) + "km\n");
+		}
+		
+		getTextOutputArea().append("\nRoute length: " + round(this.pathLength, 3) + "km\n");
+		getTextOutputArea().append("It will take " + round(this.time, dp) + " " + unit);
+	}
+
+	public List<Segment> setToList(Set<Segment> set) {
+		return new ArrayList<Segment>(set);
+	}
+	
 	public Point getPoint(Location location, double scale) {
 		return location.asPoint(new Location(0, 0), scale);
+	}
+	
+	// helper function taken from stackoverflow: http://stackoverflow.com/questions/2808535/round-a-double-to-2-decimal-places
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
 	}
 	
 	public static void main(String[] arguments) {

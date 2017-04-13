@@ -102,6 +102,7 @@ public class Node {
 			return false;
 		return true;
 	}
+	
 	public List<Node> getNeighbours() {
 		return getSegments().stream()
 				.map(seg -> seg.findOtherEnd(this))
