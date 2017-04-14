@@ -56,12 +56,12 @@ public class Node {
 		return this.location.asPoint(new Location(0, 0), scale);
 	}
 	
-	public void draw(Graphics g, double scale) {
+	public void draw(Graphics g, double scale, boolean artic) {
 		// changes the size of the node based on the scale
 		int size = Math.min((int) (0.05 * (scale)), 3);
 		g.setColor(Color.BLUE);
 		
-		if (this.isArticulation) {
+		if (this.isArticulation && artic) {
 			g.setColor(Color.YELLOW);
 		}
 		if (this.onPath) {
@@ -75,12 +75,10 @@ public class Node {
 		//System.out.println(this.ID + " {Location: " + this.getLocation() + "\n Point: " +this.getNodePoint(scale) + "}\n");
 	}
 	
-	
-	
 	public Set<Segment> getSegments() {
 		return segments;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

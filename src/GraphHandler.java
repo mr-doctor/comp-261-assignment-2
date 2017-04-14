@@ -18,7 +18,7 @@ public class GraphHandler {
 		this.nodes = m;
 	}
 	
-	public List<Node> findPath(Node start, Node goal) {
+	public List<Node> findPath(Node start, Node goal, boolean shortestDistance) {
 		
 		Queue<HandlerNode> frontier = new PriorityQueue<>();
 		Set<HandlerNode> closed = new HashSet<>();
@@ -40,12 +40,27 @@ public class GraphHandler {
 				
 				int cID = current.getNode().getID();
 				int nID = neighbour.getNode().getID();
-				Segment seg = current.getSegments().stream()
-						.filter(s -> cID == s.getNode1ID() && nID == s.getNode2ID() || cID == s.getNode2ID() && nID == s.getNode1ID())
-						.findAny()
-						.get();
+
+				Segment seg = null;
+				for (Segment s : current.getSegments()) {
+					if (s.getParentRoad().isOneWay()) {
+						if (cID == s.getNode1ID() && nID == s.getNode2ID()) {
+							seg = s;
+						}
+					} else if (cID == s.getNode1ID() && nID == s.getNode2ID() || cID == s.getNode2ID() && nID == s.getNode1ID()) {
+						seg = s;
+					}
+				}
+				if (seg == null) {
+					continue;
+				}
+				double speed = speed(seg.getParentRoad().getSpeedLimit());
 				
-				double actualCost = current.getActualCost() + seg.getLength();
+				if (shortestDistance) {
+					speed = 1;
+				}
+				
+				double actualCost = current.getActualCost() + (seg.getLength() / speed);
 				
 				if (!frontier.contains(neighbour)) {
 					frontier.add(neighbour);
@@ -63,6 +78,14 @@ public class GraphHandler {
 		return null;
 	}
 	
+	private double speed(int speed) {
+		if (speed == 0) {
+			return 5;
+		} else {
+			return speed * 20;
+		}
+	}
+
 	public double calculateHeuristic(Node a, Node b) {
 		return a.getLocation().distance(b.getLocation());
 	}
@@ -93,7 +116,6 @@ public class GraphHandler {
 		if (numSubtrees > 1) {
 			articulationPoints.add(start);
 		}
-		
 		return articulationPoints;
 	}
 	

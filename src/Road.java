@@ -9,15 +9,17 @@ public class Road {
 	private String city;
 	private boolean oneWay;
 	private int speedLimit;
+	private int roadClass;
 	private List<Segment> segments = new ArrayList<Segment>();
 	private boolean selected = false;
 	
-	public Road(int ID, String name, String city, boolean oneWay, int speedLimit) {
+	public Road(int ID, String name, String city, boolean oneWay, int speedLimit, int roadClass) {
 		this.ID = ID;
 		this.name = name;
 		this.city = city;
 		this.oneWay = oneWay;
 		this.speedLimit = speedLimit;
+		this.roadClass = roadClass;
 	}
 	
 	// getters and setters 
@@ -60,5 +62,9 @@ public class Road {
 			s.setSelected(b);
 		}
 		this.selected = false;
+	}
+
+	public int getRoadClass() {
+		return roadClass;
 	}
 }

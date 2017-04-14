@@ -30,7 +30,7 @@ public class AucklandRoads extends GUI {
 	// stores the nodes for drawing
 	private Map<Integer, Node> nodeIndex = new HashMap<>();
 	// stores the nodes for searching from click
-	private QuadTree nodes = new QuadTree(Location.newFromLatLon(Location.CENTRE_LAT, Location.CENTRE_LON), 10000);
+	//private QuadTree nodes = new QuadTree(Location.newFromLatLon(Location.CENTRE_LAT, Location.CENTRE_LON), 10000);
 	
 	// the amounts to translate the canvas by
 	private double moveX;
@@ -48,6 +48,7 @@ public class AucklandRoads extends GUI {
 	private Set<Node> articulationPoints;
 	private double pathLength = 0;
 	private double time;
+	private boolean showArticulation = false;
 	
 	public AucklandRoads() {
 		graphHandler = new GraphHandler(nodeIndex);
@@ -67,7 +68,8 @@ public class AucklandRoads extends GUI {
 				splitData[2], 							// name
 				splitData[3],							// city
 				splitData[4].equals("1"),	 			// one way or not
-				Integer.parseInt(splitData[5])));	 	// speed limit
+				Integer.parseInt(splitData[5]),			// speed limit
+				Integer.parseInt(splitData[6])));	 	// class
 		}
 		
 		// adds the node data to the QuadTree and Map
@@ -83,7 +85,7 @@ public class AucklandRoads extends GUI {
 							Double.parseDouble(splitData[1]), 
 							Double.parseDouble(splitData[2]))); // location
 			
-			nodes.insert(n);
+			//nodes.insert(n);
 			nodeIndex.put(Integer.parseInt(splitData[0]), n);
 			
 		}
@@ -156,7 +158,7 @@ public class AucklandRoads extends GUI {
 			if (this.articulationPoints.contains(entry.getValue())) {
 				entry.getValue().setArticulation(true);
 			}
-			entry.getValue().draw(g, scale);
+			entry.getValue().draw(g, scale, showArticulation);
 		}
 		
 		// draws the selected node, provided it exists at this stage
@@ -230,7 +232,7 @@ public class AucklandRoads extends GUI {
 		// for storing all roads that come off it
 		ArrayList<String> roads = new ArrayList<>();
 		
-		// for each road, check if any segments have the given node as an endpoint
+/*		// for each road, check if any segments have the given node as an endpoint
 		for (Map.Entry<String, Road> entry : roadIndex.entrySet()) {
 			Road road = entry.getValue();
 			for (Segment s : road.getSegments()) {
@@ -240,7 +242,18 @@ public class AucklandRoads extends GUI {
 					break;
 				}
 			}
+		}*/
+		
+		for (Segment s : n.getSegments()) {
+			if (!roads.contains(s.getParentRoad().getName())) {
+				if (s.getParentRoad().getName().equals("-")) {
+					roads.add("walkway");
+				} else {
+					roads.add(s.getParentRoad().getName());
+				}
+			}
 		}
+		
 		// clear the text area
 		getTextOutputArea().setText("");
 		// print the node ID, and then print every connecting road
@@ -325,7 +338,11 @@ public class AucklandRoads extends GUI {
 		return null;
 	}
 	
-	protected void pathfind() {
+	protected void toggleArticulation() {
+		this.showArticulation  = !this.showArticulation;
+	}
+	
+	protected void pathfind(boolean shortestDistance) {
 		if (this.path != null) {
 			this.pathLength = 0;
 			this.time = 0;
@@ -338,7 +355,7 @@ public class AucklandRoads extends GUI {
 		}
 		
 		if (this.selectedNode != null && this.lastNode != null) {
-			this.path = graphHandler.findPath(this.lastNode, this.selectedNode);
+			this.path = graphHandler.findPath(this.lastNode, this.selectedNode, shortestDistance);
 			if (this.path != null) {
 				for (int i=0; i<this.path.size()-1; i++) {
 					if (i != 0) {
@@ -376,17 +393,17 @@ public class AucklandRoads extends GUI {
 		getTextOutputArea().setText("");
 		Map<String, Double> roadsAndLengths = new HashMap<>();
 		
-		for (int i=0; i<this.path.size(); i++) {
-			List<Segment> segs = setToList(this.path.get(i).getSegments());
-			for (int j=0; j<segs.size(); j++) {
-				String roadName = segs.get(j).getParentRoad().getName();
+		for (Node n : this.path) {
+			List<Segment> segs = setToList(n.getSegments());
+			for (Segment s : segs) {
+				String roadName = s.getParentRoad().getName();
 				if (roadName.equals("-")) {
-					roadName = "Walkway";
+					roadName = "walkway";
 				}
 				if (roadsAndLengths.containsKey(roadName)) {
-					roadsAndLengths.put(roadName, roadsAndLengths.get(roadName) + segs.get(j).getLength());
+					roadsAndLengths.put(roadName, roadsAndLengths.get(roadName) + s.getLength());
 				} else {
-					roadsAndLengths.put(roadName, segs.get(j).getLength());
+					roadsAndLengths.put(roadName, s.getLength());
 				}
 			}
 		}
@@ -395,7 +412,7 @@ public class AucklandRoads extends GUI {
 		}
 		
 		getTextOutputArea().append("\nRoute length: " + round(this.pathLength, 3) + "km\n");
-		getTextOutputArea().append("It will take " + round(this.time, dp) + " " + unit);
+		getTextOutputArea().append("The route will take " + round(this.time, dp) + " " + unit);
 	}
 
 	public List<Segment> setToList(Set<Segment> set) {

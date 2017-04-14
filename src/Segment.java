@@ -81,7 +81,7 @@ public class Segment {
 			this.selected = false;
 		}
 		if (this.onPath) {
-			g.setColor(Color.RED.darker());
+			g.setColor(new Color(255, 0, 255));
 		}
 		
 		// for every two locations, draw a line between them at the scaled points

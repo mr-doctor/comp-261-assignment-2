@@ -1,4 +1,4 @@
-import java.awt.Color;
+/*import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
+*//**
  * This is a small example class to demonstrate extending the GUI class and
  * implementing the abstract methods. Instead of doing anything maps-related, it
  * draws some squares to the drawing area which are removed when clicked. Some
@@ -15,7 +15,7 @@ import java.util.Random;
  * buttons makes a new set of squares.
  * 
  * @author tony
- */
+ *//*
 public class SquaresExample extends GUI {
 	private static final int NUM_SQUARES = 10;
 	private static final int SQUARE_SIZE = 30;
@@ -45,12 +45,12 @@ public class SquaresExample extends GUI {
 
 	@Override
 	protected void onClick(MouseEvent e) {
-		/*
+		
 		 * we search from the back to the front of the list (while drawing
 		 * happens front-to-back) so that we always remove the top square if
 		 * there are any overlapping. this is why we use a list and not a set to
 		 * store the squares in the first place.
-		 */
+		 
 		int i = squares.size();
 		while (i --> 0) {
 			if (squares.get(i).contains(e.getX(), e.getY())) {
@@ -77,10 +77,10 @@ public class SquaresExample extends GUI {
 		getTextOutputArea().setText("example doesn't load any files.");
 	}
 
-	/**
+	*//**
 	 * A simple inner class that stores the data for the squares and has some
 	 * helper methods.
-	 */
+	 *//*
 	private static class Square {
 		public final int x, y;
 		public final Color color;
@@ -114,4 +114,4 @@ public class SquaresExample extends GUI {
 	}
 }
 
-// code for COMP261 assignments
+// code for COMP261 assignments*/

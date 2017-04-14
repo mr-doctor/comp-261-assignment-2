@@ -47,13 +47,18 @@ public abstract class GUI {
 	 * appropriate one is passed to your code when the move(Move) method is
 	 * called.
 	 */
+	
+	boolean shortestDistance;
+	
 	public enum Move {
 		NORTH, SOUTH, EAST, WEST, ZOOM_IN, ZOOM_OUT
 	};
 
 	// these are the methods you need to implement.
 	
-	protected abstract void pathfind();
+	protected abstract void pathfind(boolean shortestDistance);
+	
+	protected abstract void toggleArticulation();
 
 	/**
 	 * Is called when the drawing area is redrawn and performs all the logic for
@@ -193,10 +198,28 @@ public abstract class GUI {
 			}
 		});
 		
-		JButton pathfind = new JButton("Find Path");
-		pathfind.addActionListener(new ActionListener() {
+		JButton pathfindDistance = new JButton("Find Shortest Distance");
+		pathfindDistance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				pathfind();
+				shortestDistance = true;
+				pathfind(true);
+				redraw();
+			}
+		});
+		
+		JButton pathfindTime = new JButton("Find Shortest Time");
+		pathfindTime.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				shortestDistance = false;
+				pathfind(false);
+				redraw();
+			}
+		});
+		
+		JButton toggleArticulation = new JButton("Toggle Articulation Points");
+		toggleArticulation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				toggleArticulation();
 				redraw();
 			}
 		});
@@ -252,7 +275,6 @@ public abstract class GUI {
 		west.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				onMove(Move.WEST);
-				pathfind();
 				onSearch();
 				redraw();
 			}
@@ -262,7 +284,6 @@ public abstract class GUI {
 		east.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				onMove(Move.EAST);
-				pathfind();
 				onSearch();
 				redraw();
 			}
@@ -272,7 +293,6 @@ public abstract class GUI {
 		north.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				onMove(Move.NORTH);
-				pathfind();
 				onSearch();
 				redraw();
 			}
@@ -282,7 +302,6 @@ public abstract class GUI {
 		south.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				onMove(Move.SOUTH);
-				pathfind();
 				onSearch();
 				redraw();
 			}
@@ -292,7 +311,6 @@ public abstract class GUI {
 		in.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				onMove(Move.ZOOM_IN);
-				pathfind();
 				onSearch();
 				redraw();
 			}
@@ -302,7 +320,6 @@ public abstract class GUI {
 		out.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				onMove(Move.ZOOM_OUT);
-				pathfind();
 				onSearch();
 				redraw();
 			}
@@ -360,7 +377,9 @@ public abstract class GUI {
 		system.setMaximumSize(new Dimension(225, 150));
 		system.add(load);
 		system.add(quit);
-		system.add(pathfind);
+		system.add(pathfindDistance);
+		system.add(pathfindTime);
+		system.add(toggleArticulation);
 		controls.add(system);
 		// rigid areas are invisible components that can be used to space
 		// components out.
