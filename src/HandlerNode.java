@@ -12,7 +12,6 @@ public class HandlerNode implements Comparable<HandlerNode> {
 	
 	public int count = Integer.MAX_VALUE;
 	public int numSubtrees = 0;
-	private List<HandlerNode> articulationPoints;
 	
 	public HandlerNode(HandlerNode p, Node n, double c, double h) {
 		this.parent = p;
@@ -60,10 +59,6 @@ public class HandlerNode implements Comparable<HandlerNode> {
 	
 	public int count() {
 		return this.count;
-	}
-	
-	public List<HandlerNode> articulationPoints() {
-		return this.articulationPoints;
 	}
 	
 	public List<HandlerNode> getNeighbours() {

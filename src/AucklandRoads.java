@@ -343,6 +343,7 @@ public class AucklandRoads extends GUI {
 	}
 	
 	protected void pathfind(boolean shortestDistance, boolean considerClass) {
+		// unset the display of the route
 		if (this.path != null) {
 			this.pathLength = 0;
 			this.time = 0;
@@ -353,26 +354,33 @@ public class AucklandRoads extends GUI {
 				}
 			}
 		}
-		
+		// if we have two endpoints
 		if (this.selectedNode != null && this.lastNode != null) {
+			// find the path between them, with appropriate settings
 			this.path = graphHandler.findPath(this.lastNode, this.selectedNode, shortestDistance, considerClass);
 			if (this.path != null) {
+				// for each node, highlight it (except the first and last)
 				for (int i=0; i<this.path.size()-1; i++) {
 					if (i != 0) {
 						this.path.get(i).setOnPath(true);
 					}
+					// for every segment between the nodes
 					for (Iterator<Segment> it = this.path.get(i).getSegments().iterator(); it.hasNext();) {
 						Segment s = it.next();
+						// if the segments are bracketed by two nodes on the path, highlight them
 						if (s.findOtherEnd(this.path.get(i)).equals(this.path.get(i+1))) {
 							s.setOnPath(true);
+							// increment the total distance travelled
 							this.pathLength  += s.getLength();
+							
+							// find the speed limit on this segment
 							double speed = s.getParentRoad().getSpeedLimit();
 							if (speed == 0) {
 								speed = 5;
 							} else {
 								speed *= 20;
 							}
-							
+							// calculate the time spent on this node, and add it to the total
 							this.time += s.getLength() / speed;
 						}
 					}
@@ -383,6 +391,7 @@ public class AucklandRoads extends GUI {
 	}
 	
 	private void printRoute(boolean considerClass) {
+		// convert from decimal to time, and round accordingly
 		String unit = "hours";
 		int dp = 2;
 		if (this.time < 1) {
@@ -391,6 +400,7 @@ public class AucklandRoads extends GUI {
 			dp = 1;
 		}
 		getTextOutputArea().setText("");
+		// set up a map of road names and the distance spent on them.
 		Map<String, Double> roadsAndLengths = new HashMap<>();
 		
 		for (Node n : this.path) {
@@ -400,17 +410,21 @@ public class AucklandRoads extends GUI {
 				if (roadName.equals("-")) {
 					roadName = "walkway";
 				}
+				// if we've already been on this road, increment its distance
 				if (roadsAndLengths.containsKey(roadName)) {
 					roadsAndLengths.put(roadName, roadsAndLengths.get(roadName) + s.getLength());
+				// otherwise, add it to the map
 				} else {
 					roadsAndLengths.put(roadName, s.getLength());
 				}
 			}
 		}
+		// print out every road that we go on, and the distance travelled on it
 		for (Map.Entry<String, Double> entry : roadsAndLengths.entrySet()) {
 			getTextOutputArea().append(entry.getKey() + ": " + round(entry.getValue(), 3) + "km\n");
 		}
 		
+		// print the final route distance and time taken
 		getTextOutputArea().append("\nRoute length: " + round(this.pathLength, 3) + "km\n");
 		if (considerClass) {
 			getTextOutputArea().append("The route will take " + round(this.time, dp) + " " + unit + ", prioritising high road class");
