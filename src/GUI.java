@@ -49,6 +49,7 @@ public abstract class GUI {
 	 */
 	
 	boolean shortestDistance;
+	boolean considerClass;
 	
 	public enum Move {
 		NORTH, SOUTH, EAST, WEST, ZOOM_IN, ZOOM_OUT
@@ -56,7 +57,7 @@ public abstract class GUI {
 
 	// these are the methods you need to implement.
 	
-	protected abstract void pathfind(boolean shortestDistance);
+	protected abstract void pathfind(boolean shortestDistance, boolean considerClass);
 	
 	protected abstract void toggleArticulation();
 
@@ -202,7 +203,7 @@ public abstract class GUI {
 		pathfindDistance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				shortestDistance = true;
-				pathfind(true);
+				pathfind(true, considerClass);
 				redraw();
 			}
 		});
@@ -211,7 +212,7 @@ public abstract class GUI {
 		pathfindTime.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				shortestDistance = false;
-				pathfind(false);
+				pathfind(false, considerClass);
 				redraw();
 			}
 		});
@@ -220,6 +221,15 @@ public abstract class GUI {
 		toggleArticulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				toggleArticulation();
+				redraw();
+			}
+		});
+		
+		JButton useClass = new JButton("Use Road Class?");
+		useClass.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				considerClass = !considerClass;
+				pathfind(shortestDistance, considerClass);
 				redraw();
 			}
 		});
@@ -380,6 +390,7 @@ public abstract class GUI {
 		system.add(pathfindDistance);
 		system.add(pathfindTime);
 		system.add(toggleArticulation);
+		system.add(useClass);
 		controls.add(system);
 		// rigid areas are invisible components that can be used to space
 		// components out.

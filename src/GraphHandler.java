@@ -18,7 +18,7 @@ public class GraphHandler {
 		this.nodes = m;
 	}
 	
-	public List<Node> findPath(Node start, Node goal, boolean shortestDistance) {
+	public List<Node> findPath(Node start, Node goal, boolean shortestDistance, boolean considerClass) {
 		
 		Queue<HandlerNode> frontier = new PriorityQueue<>();
 		Set<HandlerNode> closed = new HashSet<>();
@@ -54,7 +54,13 @@ public class GraphHandler {
 				if (seg == null) {
 					continue;
 				}
-				double speed = speed(seg.getParentRoad().getSpeedLimit());
+				int roadClass = seg.getParentRoad().getRoadClass();
+				
+				if (considerClass) {
+					roadClass = 0;
+				}
+				
+				double speed = speed(seg.getParentRoad().getSpeedLimit() + roadClass);
 				
 				if (shortestDistance) {
 					speed = 1;

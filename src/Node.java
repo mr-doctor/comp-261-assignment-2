@@ -61,7 +61,7 @@ public class Node {
 		int size = Math.min((int) (0.05 * (scale)), 3);
 		g.setColor(Color.BLUE);
 		
-		if (this.isArticulation && artic) {
+		if (this.isArticulation() && artic) {
 			g.setColor(Color.YELLOW);
 		}
 		if (this.onPath) {
@@ -109,5 +109,9 @@ public class Node {
 
 	public void setArticulation(boolean b) {
 		this.isArticulation = b;
+	}
+
+	public boolean isArticulation() {
+		return isArticulation;
 	}
 }

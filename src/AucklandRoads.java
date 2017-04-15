@@ -342,7 +342,7 @@ public class AucklandRoads extends GUI {
 		this.showArticulation  = !this.showArticulation;
 	}
 	
-	protected void pathfind(boolean shortestDistance) {
+	protected void pathfind(boolean shortestDistance, boolean considerClass) {
 		if (this.path != null) {
 			this.pathLength = 0;
 			this.time = 0;
@@ -355,7 +355,7 @@ public class AucklandRoads extends GUI {
 		}
 		
 		if (this.selectedNode != null && this.lastNode != null) {
-			this.path = graphHandler.findPath(this.lastNode, this.selectedNode, shortestDistance);
+			this.path = graphHandler.findPath(this.lastNode, this.selectedNode, shortestDistance, considerClass);
 			if (this.path != null) {
 				for (int i=0; i<this.path.size()-1; i++) {
 					if (i != 0) {
@@ -377,12 +377,12 @@ public class AucklandRoads extends GUI {
 						}
 					}
 				}
-				printRoute();
+				printRoute(considerClass);
 			}
 		}
 	}
 	
-	private void printRoute() {
+	private void printRoute(boolean considerClass) {
 		String unit = "hours";
 		int dp = 2;
 		if (this.time < 1) {
@@ -412,7 +412,11 @@ public class AucklandRoads extends GUI {
 		}
 		
 		getTextOutputArea().append("\nRoute length: " + round(this.pathLength, 3) + "km\n");
-		getTextOutputArea().append("The route will take " + round(this.time, dp) + " " + unit);
+		if (considerClass) {
+			getTextOutputArea().append("The route will take " + round(this.time, dp) + " " + unit + ", prioritising high road class");
+		} else {
+			getTextOutputArea().append("The route will take " + round(this.time, dp) + " " + unit);
+		}
 	}
 
 	public List<Segment> setToList(Set<Segment> set) {
